@@ -38,3 +38,6 @@ print(marks)
 
 avg=sum(marks.values())/len(marks)
 print(avg)
+
+
+password_validation= 
