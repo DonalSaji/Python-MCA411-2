@@ -3,6 +3,8 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import kagglehub
+from pathlib import Path
 
 # --------------------------------------------------
 # PAGE CONFIGURATION
@@ -21,27 +23,41 @@ st.caption("Interactive cattle growth and farm analytics dashboard")
 # DATASET LOADING
 # --------------------------------------------------
 
-st.sidebar.header("Dataset")
 
-uploaded_file = st.sidebar.file_uploader(
-    "Upload Livestock Dataset CSV",
-    type=["csv"]
-)
-
+# --------------------------------------------------
+# LOAD DATASET DIRECTLY FROM KAGGLE
+# --------------------------------------------------
 @st.cache_data
-def load_data(file):
-    return pd.read_csv(file)
+def load_dataset():
+    # Download the latest dataset version from Kaggle
+    dataset_path = kagglehub.dataset_download(
+        "muhammedfakl/livestock-growth-and-weight-prediction-dataset"
+    )
 
-if uploaded_file is not None:
-    df = load_data(uploaded_file)
-else:
-    try:
-        df = pd.read_csv("livestock_growth_dataset.csv")
-    except FileNotFoundError:
-        st.info("Please upload your dataset CSV from Kaggle.")
-        st.stop()
+    # Find CSV files in the downloaded dataset folder
+    csv_files = list(Path(dataset_path).glob("*.csv"))
 
-df.columns = df.columns.str.strip()
+    if not csv_files:
+        raise FileNotFoundError(
+            "No CSV file was found in the downloaded Kaggle dataset."
+        )
+
+    # Load the first CSV file
+    df = pd.read_csv(csv_files[0])
+
+    return df
+
+
+try:
+    with st.spinner("Downloading/loading dataset from Kaggle..."):
+        df = load_dataset()
+except Exception as e:
+    st.error("Unable to load the Kaggle dataset.")
+    st.exception(e)
+    st.stop()
+
+st.success(f"Dataset loaded successfully: {len(df):,} records")
+
 
 
 # --------------------------------------------------
