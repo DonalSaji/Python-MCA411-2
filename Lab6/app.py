@@ -18,12 +18,6 @@ st.set_page_config(
 st.title("Livestock Growth & Weight Analytics")
 st.caption("Interactive cattle growth and farm analytics dashboard")
 
-
-# --------------------------------------------------
-# DATASET LOADING
-# --------------------------------------------------
-
-
 # --------------------------------------------------
 # LOAD DATASET DIRECTLY FROM KAGGLE
 # --------------------------------------------------
